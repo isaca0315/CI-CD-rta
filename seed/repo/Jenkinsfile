@@ -1,0 +1,35 @@
+pipeline {
+  agent any
+
+  stages {
+    stage('Test') {
+      steps {
+        sh 'echo "unit tests: ok"'
+      }
+    }
+
+    stage('Build image') {
+      steps {
+        sh 'docker build -t localhost:5000/devops-demo:${BUILD_NUMBER} app'
+      }
+    }
+
+    stage('Push image') {
+      steps {
+        sh 'docker push localhost:5000/devops-demo:${BUILD_NUMBER}'
+      }
+    }
+
+    stage('Notify') {
+      steps {
+        sh 'curl -s -o /dev/null -X POST http://hookcat:8888/jenkins/build-done -d "build=${BUILD_NUMBER}"'
+      }
+    }
+  }
+
+  post {
+    always {
+      echo "build ${BUILD_NUMBER} finished"
+    }
+  }
+}

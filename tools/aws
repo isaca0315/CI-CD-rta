@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# AWS CLI contra el emulador local (moto). Usa las credenciales del entorno.
+# Uso: export AWS_ACCESS_KEY_ID=lab AWS_SECRET_ACCESS_KEY=lab
+#      ./tools/aws s3api list-buckets
+#      ./tools/aws s3 cp s3://tfstate/prod/terraform.tfstate ./state.json
+set -euo pipefail
+
+exec docker run --rm --network host \
+  -v "${PWD}:/work" -w /work \
+  -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_SESSION_TOKEN \
+  -e AWS_DEFAULT_REGION -e AWS_ENDPOINT_URL \
+  amazon/aws-cli \
+  --endpoint-url "${AWS_ENDPOINT_URL:-http://localhost:4566}" "$@"

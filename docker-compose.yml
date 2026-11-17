@@ -1,0 +1,118 @@
+name: devops-lab
+
+services:
+
+  # ---------- VCS: sustituto local de GitHub ----------
+  gitea:
+    image: gitea/gitea:1.22
+    container_name: lab-gitea
+    environment:
+      USER_UID: "1000"
+      USER_GID: "1000"
+      GITEA__server__ROOT_URL: http://localhost:${GITEA_PORT:-3000}/
+      GITEA__server__SSH_DOMAIN: localhost
+      GITEA__security__INSTALL_LOCK: "true"
+      GITEA__service__DISABLE_REGISTRATION: "false"
+      GITEA__actions__ENABLED: "true"
+      GITEA__repository__DEFAULT_BRANCH: main
+      GITEA__webhook__ALLOWED_HOST_LIST: "*"
+      GITEA__log__LEVEL: info
+    volumes:
+      - gitea-data:/data
+    ports:
+      - "${GITEA_PORT:-3000}:3000"
+      - "2222:22"
+    networks: [lab]
+    restart: unless-stopped
+
+  # ---------- CI on-prem ----------
+  jenkins:
+    build: ./lab/jenkins
+    container_name: lab-jenkins
+    user: root
+    environment:
+      JAVA_OPTS: -Djenkins.install.runSetupWizard=false -Dhudson.model.DownloadService.noSignatureCheck=true
+      CASC_JENKINS_CONFIG: /usr/share/jenkins/ref/casc/jenkins.yaml
+    volumes:
+      - jenkins-home:/var/jenkins_home
+      # Misconfiguracion intencionada: da al CI control del daemon Docker
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "${JENKINS_PORT:-8080}:8080"
+      - "50000:50000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks: [lab]
+    restart: unless-stopped
+
+  # ---------- Registro de imagenes: sustituto local de ECR ----------
+  registry:
+    image: registry:2
+    container_name: lab-registry
+    environment:
+      REGISTRY_HTTP_ADDR: 0.0.0.0:5000
+      REGISTRY_STORAGE_DELETE_ENABLED: "true"
+    volumes:
+      - registry-data:/var/lib/registry
+    ports:
+      - "${REGISTRY_PORT:-5000}:5000"
+    networks: [lab]
+
+  # ---------- S3/STS/ECR/IAM local (backend de Terraform y labs AWS) ----------
+  moto:
+    image: motoserver/moto:latest
+    container_name: lab-moto
+    environment:
+      MOTO_PORT: "5000"
+    ports:
+      - "${MOTO_PORT:-4566}:5000"
+    networks: [lab]
+
+  # ---------- Webhook catcher: sustituto de webhook.site ----------
+  hookcat:
+    build: ./lab/hookcat
+    container_name: lab-hookcat
+    ports:
+      - "${HOOKCAT_PORT:-8888}:8888"
+    networks: [lab]
+
+  # ---------- App victima (RCE + IMDS falso) ----------
+  webapp:
+    build: ./lab/webapp
+    container_name: lab-webapp
+    cap_add: [NET_ADMIN]
+    environment:
+      FLAG: FLAG{dockerfile_backdoor}
+      IDENTITY_ENDPOINT: http://169.254.169.254/azure/token
+      IDENTITY_HEADER: lab-secret
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    networks: [lab]
+
+  # ---------- Runner de Gitea Actions (perfil "ci") ----------
+  act_runner:
+    image: gitea/act_runner:latest
+    container_name: lab-act-runner
+    profiles: ["ci"]
+    depends_on: [gitea]
+    # run.sh solo pasa --config si CONFIG_FILE esta definido.
+    environment:
+      CONFIG_FILE: /data/config.yaml
+      GITEA_INSTANCE_URL: http://gitea:3000
+      GITEA_RUNNER_REGISTRATION_TOKEN: ${RUNNER_TOKEN:-}
+      GITEA_RUNNER_NAME: lab-runner
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./lab/act_runner:/data
+    networks: [lab]
+    restart: unless-stopped
+
+  # ---------- AWS simulado (ya no hace falta perfil: moto es core) ----------
+volumes:
+  gitea-data:
+  jenkins-home:
+  registry-data:
+
+networks:
+  lab:
+    name: devops-lab_default

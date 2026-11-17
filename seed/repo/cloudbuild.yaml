@@ -1,0 +1,5 @@
+steps:
+  - name: 'ubuntu'
+    args: ['bash', '-c', 'echo building devops-demo']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'devops-demo', 'app']

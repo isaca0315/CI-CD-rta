@@ -1,0 +1,30 @@
+# material protegido: no redistribuir
+*.pdf
+*.PDF
+Docker-Avanzado-Clase3.pptx
+
+# entorno local
+.env
+
+# estado generado por el lab
+seed/repo/.git/
+seed/repo/secrets/
+lab/act_runner/.runner
+lab/act_runner/work/
+
+# terraform
+**/.terraform/
+**/*.tfstate
+**/*.tfstate.*
+**/tfplan
+**/orig.json
+**/tampered.json
+
+# salidas de escaneos
+gitleaks.json
+zap-*.html
+zap.yaml
+sbom.json
+
+# bloqueos de LibreOffice
+.~*.pptx

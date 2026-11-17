@@ -1,0 +1,21 @@
+log:
+  level: info
+
+runner:
+  file: /data/.runner
+  capacity: 1
+  timeout: 10m
+  labels:
+    - ubuntu-latest:docker://alpine:3.20
+
+cache:
+  enabled: false
+
+container:
+  # Los jobs corren como contenedores hermanos y deben resolver gitea/hookcat
+  network: "devops-lab_default"
+  privileged: false
+  options: "--volume /tmp:/host-tmp:ro"
+
+host:
+  workdir_parent: /data/work

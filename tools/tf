@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Terraform en contenedor: no hace falta instalarlo en el host.
+# Uso: ./tools/tf init   |   ./tools/tf plan   |   ./tools/tf apply
+set -euo pipefail
+
+if ! command -v docker >/dev/null; then
+  echo "falta docker" >&2
+  exit 1
+fi
+
+# -t solo si hay terminal, para que funcione tambien en scripts/CI
+TTY=""
+[ -t 0 ] && [ -t 1 ] && TTY="-t"
+
+exec docker run --rm -i $TTY --network host \
+  -e TF_IN_AUTOMATION=1 \
+  -v "${PWD}:/tf" -w /tf \
+  -v "${HOME}:/hosthome:ro" \
+  hashicorp/terraform:1.9 "$@"

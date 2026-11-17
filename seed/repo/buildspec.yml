@@ -1,0 +1,16 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo "installing dependencies"
+  build:
+    commands:
+      - echo "building artifact"
+  post_build:
+    commands:
+      - echo "build finished"
+
+artifacts:
+  files:
+    - app/**/*

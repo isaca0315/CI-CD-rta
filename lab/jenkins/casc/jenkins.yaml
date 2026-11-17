@@ -1,0 +1,54 @@
+jenkins:
+  systemMessage: "DO-RTA local lab - Jenkins sin hardening (a proposito)"
+  numExecutors: 2
+  securityRealm:
+    local:
+      users:
+        - id: "devops"
+          password: "devops123"
+        - id: "dev"
+          password: "dev12345"
+  # Cualquiera puede hacer cualquier cosa: asi se reproduce el Jenkins
+  # expuesto del curso. NO usar en produccion.
+  authorizationStrategy:
+    unsecured: {}
+
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+          - string:
+              scope: GLOBAL
+              id: prod-deploy-key
+              secret: "FLAG{jenkins_cred_decrypt}"
+              description: "Prod deploy API key"
+          - usernamePassword:
+              scope: GLOBAL
+              id: registry-creds
+              username: lab
+              password: lab
+              description: "Local registry"
+
+jobs:
+  - script: >
+      pipelineJob('build-and-push') {
+        description('Build de la app y push al registry local')
+        definition {
+          cpsScm {
+            scm {
+              git {
+                remote { url('http://gitea:3000/devops-org/devops-demo.git') }
+                branch('*/main')
+              }
+            }
+            scriptPath('Jenkinsfile')
+          }
+        }
+      }
+  - script: >
+      freeStyleJob('prod-deploy') {
+        description('Deploy a produccion (deja un flag en el log)')
+        steps {
+          shell('echo "[prod-deploy] start"; echo FLAG{jenkins_api_token_logs}; echo "[prod-deploy] done"')
+        }
+      }

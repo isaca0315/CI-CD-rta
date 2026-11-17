@@ -1,0 +1,15 @@
+name: notify
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: send build info
+        shell: sh
+        run: |
+          wget -qO- --post-data "repo=${GITHUB_REPOSITORY} actor=${GITHUB_ACTOR}" \
+            http://hookcat:8888/gitea/notify
