@@ -5,37 +5,13 @@
 > escribe el pipeline, ejecuta los escaneos y aporta la evidencia. No hay
 > workflow ni configuraciones resueltas.
 
+Versión PDF: [proyecto-semestral.pdf](proyecto-semestral.pdf).
+
 ## 1. Lo que espero
 
-```mermaid
-flowchart TD
-    subgraph MAR["Marco OWASP — obligatorio en todo el proyecto"]
-        direction LR
-        W["OWASP Web Top 10 2021"]
-        A["OWASP API Top 10 2023"]
-        M["OWASP Mobile Top 10 2024 — variante opcional"]
-        C["OWASP CI/CD Top 10 2022"]
-    end
+![Lo que espero del proyecto semestral](diagramas/01-lo-que-espero.png)
 
-    subgraph TRA["Trabajo del estudiante — 16 semanas"]
-        direction LR
-        T1["1 · Alcance y ROE"]
-        T2["2 · Repo y permisos"]
-        T3["3 · Staging y spec"]
-        T4["4 · Escaneos"]
-        T5["5 · Evidencia y defensa"]
-    end
-
-    subgraph ENT["Entregable final"]
-        direction LR
-        E1["Pipeline en GitHub Actions"]
-        E2["Reportes de escaneo + hashes"]
-        E3["Matrices OWASP Web/API y CICD-SEC"]
-        E4["Informe y demostración"]
-    end
-
-    MAR --> TRA --> ENT
-```
+Fuente Mermaid: [01-lo-que-espero.mmd](diagramas/01-lo-que-espero.mmd).
 
 El proyecto se da por terminado cuando el pipeline está alineado con OWASP y la
 matriz de riesgos se apoya en ejecuciones reales. El marco, las decisiones de
@@ -74,51 +50,15 @@ verse en los logs.
 
 Este diagrama describe el diseño. Cada equipo decide cómo implementarlo.
 
-```mermaid
-flowchart LR
-    DEV["Desarrollador"] -->|"cambio propuesto"| REPO["Repositorio GitHub<br/>rama principal protegida"]
-    REPO --> CI["GitHub Actions"]
-    subgraph RUN["Ejecución efímera y con privilegios mínimos"]
-        direction TB
-        G["Comprobación de alcance"]
-        S["Escaneo de secretos"]
-        P["Escaneo pasivo"]
-        A["Escaneo de API"]
-        F["Escaneo activo"]
-    end
-    CI --> G
-    G --> S --> P
-    G --> A
-    G --> F
-    P -. "solo tráfico pasivo" .-> STG
-    A -- "tráfico activo" --> STG
-    F -- "tráfico activo" --> STG
-    STG["Staging efímero autorizado"] --> APP["Aplicación web + API<br/>+ definición OpenAPI"]
-    P --> EV["Reportes + hash<br/>y resumen del job"]
-    A --> EV
-    F --> EV
-    EV --> VIS["Quebrar el build si procede<br/>y dejar trazabilidad"]
-    AP["Aprobación humana<br/>para tráfico activo"] -.-> F
-```
+![Arquitectura esperada del pipeline](diagramas/02-arquitectura.png)
+
+Fuente Mermaid: [02-arquitectura.mmd](diagramas/02-arquitectura.mmd).
 
 ## 5. Flujo esperado
 
-```mermaid
-flowchart TD
-    A["¿Qué disparó el pipeline?"] --> B{"¿Pull request?"}
-    B -->|"sí"| C["Validar alcance"]
-    B -->|"no"| D{"Programado o manual"}
-    C --> E["Buscar secretos"] --> F["Escaneo pasivo"]
-    F --> G{"¿Hallazgo crítico?"}
-    G -->|"sí"| H["Bloquear el cambio"]
-    G -->|"no"| I["Check correcto + reportes"]
-    D -->|"programado"| C2["Validar alcance"] --> J["Escaneo de API en staging"]
-    D -->|"manual"| K{"¿Alcance firmado?"}
-    K -->|"no"| L["No ejecutar"]
-    K -->|"sí"| M["Entorno con aprobadores"] --> N["Escaneo activo"]
-    J --> O["Evidencia: reportes + hash + resumen"]
-    N --> O
-```
+![Flujo esperado del pipeline](diagramas/03-flujo.png)
+
+Fuente Mermaid: [03-flujo.mmd](diagramas/03-flujo.mmd).
 
 El trabajo que ejecuta código propuesto en una PR no debe tener permisos de
 escritura ni secretos. El workflow debe vivir en la rama protegida y su
@@ -126,28 +66,9 @@ modificación debe exigir revisión.
 
 ## 6. Secuencia esperada del escaneo activo
 
-```mermaid
-sequenceDiagram
-    actor Dev
-    participant GH as GitHub
-    participant Env as Aprobación del entorno
-    participant Run as Ejecución efímera
-    participant Scan as Escáner
-    participant Stg as Staging autorizado
+![Secuencia esperada del escaneo activo](diagramas/04-secuencia-activo.png)
 
-    Dev->>GH: Solicitar escaneo activo con alcance firmado
-    GH->>Env: Pedir aprobación
-    Env-->>GH: Aprobado por el responsable
-    GH->>Run: Iniciar trabajo con permisos mínimos
-    Run->>Run: Comprobar que el objetivo está en el alcance
-    Run->>Scan: Ejecutar escaneo con imagen verificada
-    Scan->>Stg: Tráfico de ataque controlado
-    Stg-->>Scan: Respuestas
-    Scan-->>Run: Reportes y código de salida
-    Run->>Run: Calcular hash y escribir resumen
-    Run-->>GH: Adjuntar evidencia y resultado
-    GH-->>Dev: Aviso con enlace a la ejecución
-```
+Fuente Mermaid: [04-secuencia-activo.mmd](diagramas/04-secuencia-activo.mmd).
 
 ## 7. Lo que debe demostrar sobre la aplicación
 
@@ -272,3 +193,10 @@ El estudiante debe decidir y justificar:
 - [ ] Reportes con hash verificable y caducidad definida.
 - [ ] Matrices OWASP y CICD-SEC basadas en ejecuciones reales.
 - [ ] Hallazgos remediados y verificados de nuevo.
+
+## 14. Diagramas y PDF
+
+Los cuatro diagramas están en `diagramas/` como PNG y como fuente `.mmd`. Los
+PNG salen de los `.mmd` con Kroki y cairosvg a tres veces su tamaño. El PDF se
+genera desde este README con WeasyPrint. Cualquier exportador de Markdown a PDF
+muestra los diagramas porque ya son imágenes, sin necesidad de interpretar Mermaid.

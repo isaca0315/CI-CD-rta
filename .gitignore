@@ -1,6 +1,7 @@
 # material protegido: no redistribuir
 *.pdf
 *.PDF
+!proyecto-semestral/proyecto-semestral.pdf
 Docker-Avanzado-Clase3.pptx
 
 # entorno local

@@ -1,0 +1,24 @@
+flowchart LR
+    DEV["Desarrollador"] -->|"cambio propuesto"| REPO["Repositorio GitHub<br/>rama principal protegida"]
+    REPO --> CI["GitHub Actions"]
+    subgraph RUN["Ejecución efímera y con privilegios mínimos"]
+        direction TB
+        G["Comprobación de alcance"]
+        S["Escaneo de secretos"]
+        P["Escaneo pasivo"]
+        A["Escaneo de API"]
+        F["Escaneo activo"]
+    end
+    CI --> G
+    G --> S --> P
+    G --> A
+    G --> F
+    P -. "solo tráfico pasivo" .-> STG
+    A -- "tráfico activo" --> STG
+    F -- "tráfico activo" --> STG
+    STG["Staging efímero autorizado"] --> APP["Aplicación web + API<br/>+ definición OpenAPI"]
+    P --> EV["Reportes + hash<br/>y resumen del job"]
+    A --> EV
+    F --> EV
+    EV --> VIS["Quebrar el build si procede<br/>y dejar trazabilidad"]
+    AP["Aprobación humana<br/>para tráfico activo"] -.-> F

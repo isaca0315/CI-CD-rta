@@ -1,0 +1,27 @@
+flowchart TD
+    subgraph MAR["Marco OWASP — obligatorio en todo el proyecto"]
+        direction LR
+        W["OWASP Web Top 10 2021"]
+        A["OWASP API Top 10 2023"]
+        M["OWASP Mobile Top 10 2024 — variante opcional"]
+        C["OWASP CI/CD Top 10 2022"]
+    end
+
+    subgraph TRA["Trabajo del estudiante — 16 semanas"]
+        direction LR
+        T1["1 · Alcance y ROE"]
+        T2["2 · Repo y permisos"]
+        T3["3 · Staging y spec"]
+        T4["4 · Escaneos"]
+        T5["5 · Evidencia y defensa"]
+    end
+
+    subgraph ENT["Entregable final"]
+        direction LR
+        E1["Pipeline en GitHub Actions"]
+        E2["Reportes de escaneo + hashes"]
+        E3["Matrices OWASP Web/API y CICD-SEC"]
+        E4["Informe y demostración"]
+    end
+
+    MAR --> TRA --> ENT

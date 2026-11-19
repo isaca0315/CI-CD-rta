@@ -1,0 +1,14 @@
+flowchart TD
+    A["¿Qué disparó el pipeline?"] --> B{"¿Pull request?"}
+    B -->|"sí"| C["Validar alcance"]
+    B -->|"no"| D{"Programado o manual"}
+    C --> E["Buscar secretos"] --> F["Escaneo pasivo"]
+    F --> G{"¿Hallazgo crítico?"}
+    G -->|"sí"| H["Bloquear el cambio"]
+    G -->|"no"| I["Check correcto + reportes"]
+    D -->|"programado"| C2["Validar alcance"] --> J["Escaneo de API en staging"]
+    D -->|"manual"| K{"¿Alcance firmado?"}
+    K -->|"no"| L["No ejecutar"]
+    K -->|"sí"| M["Entorno con aprobadores"] --> N["Escaneo activo"]
+    J --> O["Evidencia: reportes + hash + resumen"]
+    N --> O
