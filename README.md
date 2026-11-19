@@ -114,10 +114,9 @@ Todo el curso se entrega en dos tareas, sin material adicional:
 Cada uno trae enunciado, pasos por lab, entrega y rubrica de 100 puntos. Los dos
 juntos cubren los 20 labs. La clase 2 deja listo el primero.
 
-Ademas esta el
-[proyecto semestral](proyecto-semestral/README.md): 16 semanas para montar un
-pipeline de GitHub Actions con OWASP ZAP (web + API) y disenarlo contra los diez
-riesgos del OWASP Top 10 CI/CD, con diagramas Mermaid y rubrica propia.
+[Proyecto semestral](proyecto-semestral/README.md): 16 semanas para montar un
+pipeline de GitHub Actions con OWASP ZAP (web + API), disenado contra los diez
+riesgos del OWASP Top 10 CI/CD. Incluye diagramas Mermaid y rubrica propia.
 
 ## Las 4 clases
 

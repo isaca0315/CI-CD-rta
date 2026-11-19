@@ -1,9 +1,9 @@
-# Proyecto semestral — Pipeline OWASP con GitHub Actions
+# Proyecto semestral: pipeline OWASP con GitHub Actions
 
-> **Guía del estudiante.** El docente entrega el marco, los diagramas de lo que
-> se espera, los hitos y la rúbrica. El estudiante decide la implementación,
-> escribe el pipeline, ejecuta los escaneos y aporta la evidencia. Aquí no hay
-> workflow ni configuraciones resueltas: eso es el trabajo.
+> Guía del estudiante. El docente entrega el marco, los diagramas de lo que se
+> espera, los hitos y la rúbrica. El estudiante decide la implementación,
+> escribe el pipeline, ejecuta los escaneos y aporta la evidencia. No hay
+> workflow ni configuraciones resueltas.
 
 ## 1. Lo que espero
 
@@ -37,10 +37,9 @@ flowchart TD
     MAR --> TRA --> ENT
 ```
 
-La expectativa es una cadena completa: **marco OWASP → decisiones de diseño →
-pipeline ejecutándose → evidencia que demuestra por qué el pipeline es seguro**.
-Un workflow que escanea pero no está alineado con OWASP, o una matriz OWASP sin
-un run real detrás, no cierra el proyecto.
+El proyecto se da por terminado cuando el pipeline está alineado con OWASP y la
+matriz de riesgos se apoya en ejecuciones reales. El marco, las decisiones de
+diseño, el pipeline funcionando y la evidencia forman parte de la misma entrega.
 
 ## 2. Marco OWASP aplicado
 
@@ -61,20 +60,19 @@ mismas ideas a GitHub Actions real.
 
 Antes de escribir código, el equipo entrega por escrito:
 
-- Superficie elegida: **web + API** con OpenAPI (o la variante móvil).
+- Superficie elegida: web + API con OpenAPI (o la variante móvil).
 - Activo autorizado, ventana de pruebas y quién aprueba un escaneo activo.
 - Prohibición explícita de escanear producción sin alcance firmado.
 - Límite de impacto: sin DoS, sin exfiltración, sin datos reales de clientes.
 - Formato de evidencia: fecha UTC, versión de la herramienta, URL del run y
   hash de los reportes.
 
-La forma de hacer cumplir el alcance dentro del pipeline es decisión del
-estudiante, pero debe ser verificable en los logs.
+Cada equipo decide cómo aplicar el alcance en el pipeline. El resultado debe
+verse en los logs.
 
 ## 4. Arquitectura esperada
 
-Este diagrama describe el **diseño**, no una implementación. Cada equipo decide
-cómo materializarlo.
+Este diagrama describe el diseño. Cada equipo decide cómo implementarlo.
 
 ```mermaid
 flowchart LR
@@ -122,9 +120,9 @@ flowchart TD
     N --> O
 ```
 
-**Restricción de diseño:** el trabajo que ejecuta código propuesto en una PR no
-debe tener permisos de escritura ni secretos. El workflow debe vivir en la rama
-protegida y su modificación debe exigir revisión.
+El trabajo que ejecuta código propuesto en una PR no debe tener permisos de
+escritura ni secretos. El workflow debe vivir en la rama protegida y su
+modificación debe exigir revisión.
 
 ## 6. Secuencia esperada del escaneo activo
 
@@ -153,10 +151,9 @@ sequenceDiagram
 
 ## 7. Lo que debe demostrar sobre la aplicación
 
-No basta con decir "ZAP pasó". Cada categoría debe tener una entrada en la
-matriz: señal observada, categoría OWASP, evidencia y juicio del estudiante.
-Marca `NO` cuando la categoría no sea automatizable y explica cómo la comprobaste
-a mano.
+Cada categoría necesita una entrada en la matriz: señal observada, categoría
+OWASP, evidencia y juicio del estudiante. Marca `NO` cuando la categoría no sea
+automatizable y explica cómo la comprobaste a mano.
 
 ### 7.1 OWASP Web Top 10 2021
 
@@ -188,7 +185,7 @@ a mano.
 | API9 Improper Inventory | Rutas desplegadas frente a rutas documentadas |
 | API10 Unsafe Consumption | Llamadas salientes del pipeline a hosts no controlados |
 
-### 7.3 Variante móvil — OWASP Mobile Top 10 2024
+### 7.3 Variante móvil: OWASP Mobile Top 10 2024
 
 Si se elige la variante móvil, la matriz cubre M1 (credenciales), M2 (supply
 chain), M3 (autenticación), M4 (validación de entrada/salida), M5 (comunicación),
@@ -224,7 +221,7 @@ prueba de que se cumple.
 | 5 | CICD-SEC-3, 6 | Diseñar el esqueleto del pipeline y el escaneo de secretos | PR de secretos |
 | 6 | Web A01-A10 | Primer escaneo pasivo | Reporte inicial |
 | 7 | A02/A05/API8 | Definir umbrales y excepciones justificadas | Tabla de decisión |
-| 8 | CICD-SEC-1, 10 | Consolidar el flujo de PR y su trazabilidad | **Hito 1: pipeline de PR** |
+| 8 | CICD-SEC-1, 10 | Consolidar el flujo de PR y su trazabilidad | Hito 1: pipeline de PR |
 | 9 | API1-API10 | Escaneo de API sobre la spec | Reporte de API |
 | 10 | Cobertura OWASP | Completar matrices de la sección 7 | Matriz Web + API |
 | 11 | CICD-SEC-1, 5 | Habilitar aprobación y ejecutar escaneo activo | Acta + ejecución |
@@ -232,9 +229,9 @@ prueba de que se cumple.
 | 13 | CICD-SEC-6 a 10 | Auditar los cinco últimos requisitos | Matriz 6-10 |
 | 14 | A09 / CICD-SEC-10 | Cuaderno de evidencias con hashes y fechas | Evidencia completa |
 | 15 | Remediación | Corregir dos hallazgos y repetir el escaneo | Antes/después |
-| 16 | Defensa | Presentar el pipeline y el razonamiento | **Informe final** |
+| 16 | Defensa | Presentar el pipeline y el razonamiento | Informe final |
 
-## 10. Pautas, no recetas
+## 10. Decisiones del estudiante
 
 El estudiante debe decidir y justificar:
 
